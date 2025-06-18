@@ -1,0 +1,23 @@
+[package]
+name = "sample-template"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+actix-web = "4"
+
+#to serilixe amd deserilize data
+serde = { version = "1.0.219", features = ["derive"] }
+
+
+sqlx = { version = "0.7.0", features = ["postgres", "runtime-tokio-native-tls"] }
+sea-orm = { version = "0.12", features = ["sqlx-postgres", "runtime-tokio-native-tls"] }
+tokio = { version = "1", features = ["full"] }
+log = "0.4.27"
+
+#password hash
+argon2 = "0.5.3"
+
+#j/son web token for auth teh user via  a secure path and gen a  token to validate the session
+jsonwebtoken = "9.3.1"
+
