@@ -3,7 +3,8 @@ use actix_web::{HttpResponse, Responder};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use crate::models::jwt_claims::JwtClaims;
 
-pub fn user_jwt_encoder(enterfield: String, role: String) -> impl Responder {
+pub fn user_jwt_encoder(email_or_username: String, role: String, user_id: u32) -> impl Responder
+{ 
     // 1. Get current UNIX timestamp and add 1 hour (3600 seconds)
     let exp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -11,8 +12,10 @@ pub fn user_jwt_encoder(enterfield: String, role: String) -> impl Responder {
         .as_secs() + 3600;
 
     // 2. Build the claims struct
-    let claims = JwtClaims {
-        enterfield: enterfield.to_string(),
+    let claims = JwtClaims
+    {
+        id: user_id as u32,
+        email_or_username: email_or_username.to_string(),
         roles: role.to_string(),
         exp: exp as usize, // JWT expects this as usize
     };

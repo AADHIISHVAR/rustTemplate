@@ -1,6 +1,6 @@
 use crate::models::registerNewUser::RegisterUser;
 use actix_web::{post, web, HttpResponse, Responder};
-use sea_orm::{ActiveModelTrait, DatabaseConnection, Set};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, NotSet, Set};
 use crate::entitys::newUserEntity;
 
 use argon2::{
@@ -30,7 +30,7 @@ pub async fn register_users(db: web::Data<DatabaseConnection>, new_user: web::Js
 
     let user = newUserEntity::ActiveModel
     {
-        id: Set(new_user.id.clone()),
+        id: NotSet,
         name: Set(new_user.name.clone()),
         username: Set(new_user.username.clone()),
         email: Set(new_user.email.clone()),

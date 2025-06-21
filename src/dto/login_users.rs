@@ -1,3 +1,4 @@
+use std::fmt::format;
 use sea_orm::{EntityTrait, QueryFilter, ColumnTrait, DatabaseConnection, DbErr};
 use actix_web::{web, HttpResponse, Responder};
 use crate::models::login_user_model::LoginUser;
@@ -13,7 +14,7 @@ pub async fn login_users(login_user: web::Json<LoginUser>, db: web::Data<Databas
     let username_or_email = login_user.username_or_email.clone();
     let input_password = login_user.password.clone();
 
-    //WHERE username = 'value' OR email = 'value'
+    //WHERE username = 'value' OR email = 'value' | its like the query
     let retrive_data = Condition::any()
         .add(newUserEntity::Column::Username.eq(username_or_email.clone()))
         .add(newUserEntity::Column::Email.eq(username_or_email.clone()));
@@ -23,6 +24,7 @@ pub async fn login_users(login_user: web::Json<LoginUser>, db: web::Data<Databas
         .filter(retrive_data)
         .one(db.get_ref())
         .await;
+    
 
     //step2 : compare teh password in teh db and teh user entered
     match user
@@ -35,12 +37,14 @@ pub async fn login_users(login_user: web::Json<LoginUser>, db: web::Data<Databas
                     .verify_password(input_password.as_bytes(), &parsed_hash.unwrap())  // plain password as input
                     .is_ok()
                 {
-                    user_jwt_encoder(username_or_email, "public".to_string());
+                    user_jwt_encoder(username_or_email, "public".to_string(), user_model.id as u32);
                     HttpResponse::Ok().body("user logged in")
+                    
                 } 
                 else {
                     HttpResponse::Unauthorized().body("invalid credentials")
                 }
+                
 
             },
         Err(e) => {
@@ -51,5 +55,7 @@ pub async fn login_users(login_user: web::Json<LoginUser>, db: web::Data<Databas
             {
                 HttpResponse::Ok().body(format!("no user found in the given param(email or username) {}", &login_user.username_or_email))
             }
+        
     }
+    
 }
